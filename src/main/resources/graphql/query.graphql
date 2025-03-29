@@ -1,0 +1,22 @@
+scalar Date
+
+type Query{
+    photo(id: ID): Photo!
+    photos(page: Int, size: Int):   PhotoConnection
+}
+
+type Mutation{
+    addPhoto(input: PhotoInput) : Photo!
+}
+
+type Photo{
+    id: ID!
+    description: String
+    lastModifyDate: Date!
+    content:String!
+}
+
+input PhotoInput{
+    description: String
+    content:String!
+}
