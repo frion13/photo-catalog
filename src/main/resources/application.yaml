@@ -51,4 +51,7 @@ server:
 api:
   version: v2.0
 
+photocatalog:
+  base-uri: "http://127.0.0.1:8282"
+
 

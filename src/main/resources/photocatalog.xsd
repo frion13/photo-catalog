@@ -1,0 +1,63 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="photocatalog"
+           targetNamespace="photocatalog" elementFormDefault="qualified">
+
+    <!-- REQUEST TYPES -->
+    <xs:element name="idRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="pageRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="page" type="xs:int"/>
+                <xs:element name="size" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="photoInputRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="description" type="xs:string"/>
+                <xs:element name="content" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+
+    <!-- RESPONSE TYPES -->
+
+    <xs:element name="photoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="photo" type="tns:photo"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="photosResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="photos" type="tns:photo" minOccurs="0" maxOccurs="unbounded">
+                </xs:element>
+                <xs:element name="totalElements" type="xs:long" minOccurs="0"/>
+                <xs:element name="totalPages" type="xs:int" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- CUSTOM TYPES -->
+
+    <xs:complexType name="photo">
+        <xs:sequence>
+            <xs:element name="id" type="xs:string"/>
+            <xs:element name="description" type="xs:string"/>
+            <xs:element name="content" type="xs:string"/>
+            <xs:element minOccurs="0" name="lastModifyDate" type="xs:dateTime"/>
+                </xs:sequence>
+    </xs:complexType>
+</xs:schema>
