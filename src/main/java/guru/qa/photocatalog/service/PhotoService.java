@@ -13,7 +13,9 @@ public interface PhotoService {
 
     Slice<PhotoGql> allPhotosGql(Pageable pageable);
 
-    Photo addPhotoGql(Photo photo);
+    PhotoGql addPhotoGql(PhotoGql photo);
+
+    Photo addPhoto(Photo photo);
 
     PhotoGql addPhotoGql(PhotoInputGql photo);
 

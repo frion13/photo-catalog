@@ -2,6 +2,8 @@ package guru.qa.photocatalog.service;
 
 import guru.qa.photocatalog.data.PhotoEntity;
 import guru.qa.photocatalog.data.PhotoRepository;
+import guru.qa.photocatalog.domain.Event;
+import guru.qa.photocatalog.domain.EventType;
 import guru.qa.photocatalog.domain.Photo;
 import guru.qa.photocatalog.domain.graphql.PhotoGql;
 import guru.qa.photocatalog.domain.graphql.PhotoInputGql;
@@ -9,6 +11,7 @@ import guru.qa.photocatalog.ex.PhotoNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -17,12 +20,15 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-public class dbPhotoService implements PhotoService {
+public class DbPhotoService implements PhotoService {
     private final PhotoRepository photoRepository;
+    private final KafkaTemplate<String, Event> kafkaTemplate;
+
 
     @Autowired
-    public dbPhotoService(PhotoRepository photoRepository) {
+    public DbPhotoService(PhotoRepository photoRepository, KafkaTemplate<String, Event> kafkaTemplate) {
         this.photoRepository = photoRepository;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     @Override
@@ -49,8 +55,44 @@ public class dbPhotoService implements PhotoService {
     }
 
     @Override
-    public Photo addPhotoGql(Photo photo) {
-        return null;
+    public PhotoGql addPhotoGql(PhotoGql photo) {
+        final Date date = new Date();
+
+        PhotoEntity photoEntity = new PhotoEntity();
+        photoEntity.setContent(photo.content().getBytes());
+        photoEntity.setDescription(photo.description());
+        photoEntity.setLastModifyDate(date);
+        PhotoEntity saved = photoRepository.save(photoEntity);
+        kafkaTemplate.send("events", new Event(
+                date,
+                EventType.NEW
+        ));
+        return new PhotoGql(
+                saved.getId(),
+                saved.getDescription(),
+                saved.getLastModifyDate(),
+                new String(saved.getContent())
+        );
+    }
+
+    @Override
+    public Photo addPhoto(Photo photo) {
+        final Date date = new Date();
+
+        PhotoEntity photoEntity = new PhotoEntity();
+        photoEntity.setContent(photo.content().getBytes());
+        photoEntity.setDescription(photo.description());
+        photoEntity.setLastModifyDate(date);
+        PhotoEntity saved = photoRepository.save(photoEntity);
+        kafkaTemplate.send("events", new Event(
+                date,
+                EventType.NEW
+        ));
+        return new Photo(
+                saved.getDescription(),
+                saved.getLastModifyDate(),
+                new String(saved.getContent())
+        );
     }
 
     @Override
